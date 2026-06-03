@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getDeck, formatMoney, itemIcon, type DeckItem } from "@/lib/decks";
+import { getDeck, formatMoney, itemIcon, metricLabel, type DeckDef, type DeckItem } from "@/lib/decks";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 function shuffle<T>(arr: T[]): T[] {
@@ -155,14 +155,14 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {/* 左卡:已揭示 */}
-          <Card item={left} valueLabel={deck.valueLabel} revealed value={formatMoney(left.value)} />
+          <Card item={left} deck={deck} valueLabel={deck.valueLabel} revealed value={formatMoney(left.value)} />
 
           {/* 右卡:待猜 / 揭示中 */}
           <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 bg-gradient-to-b from-gray-50 to-white p-5 text-center">
             <div className="text-4xl">{itemIcon(right)}</div>
             <div className="text-lg font-bold text-gray-900">{right.name}</div>
             <div className="text-xs uppercase tracking-wide text-gray-400">
-              {right.category} · {right.asOf}
+              {right.category} · {metricLabel(deck, right)} · {right.asOf}
             </div>
 
             {phase === "revealed" ? (
@@ -208,11 +208,13 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
 
 function Card({
   item,
+  deck,
   valueLabel,
   revealed,
   value,
 }: {
   item: DeckItem;
+  deck: DeckDef;
   valueLabel: string;
   revealed: boolean;
   value: string;
@@ -222,7 +224,7 @@ function Card({
       <div className="text-4xl">{itemIcon(item)}</div>
       <div className="text-lg font-bold text-gray-900">{item.name}</div>
       <div className="text-xs uppercase tracking-wide text-gray-400">
-        {item.category} · {item.asOf}
+        {item.category} · {metricLabel(deck, item)} · {item.asOf}
       </div>
       {revealed && (
         <div>

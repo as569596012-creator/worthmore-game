@@ -35,7 +35,8 @@ export interface DeckDef {
   keywords: string[];
   howTo: string[];
   body: string;
-  valueLabel: string; // 卡片上数值的说明,如 "total value (USD)"
+  valueLabel: string; // 卡片上数值的说明,如 "value in US dollars"
+  metric?: string; // deck 级指标覆盖(如人均 GDP);留空则按类别推断(见 metricLabel)
   faq: FaqItem[];
   items: DeckItem[];
 }
@@ -60,6 +61,21 @@ const CATEGORY_FLAG: Record<Category, string> = {
 
 export function itemIcon(item: DeckItem): string {
   return item.flag || CATEGORY_FLAG[item.category];
+}
+
+// 每个类别数值到底是"什么钱":GDP 是年度产出(流量),市值/估值是存量。
+// 标清楚避免把"年度 GDP"误解成"国家总财富"。
+const CATEGORY_METRIC: Record<Category, string> = {
+  Country: "annual GDP",
+  "US State": "annual GDP",
+  "CN Province": "annual GDP",
+  Company: "market cap",
+  "Sports Team": "team value",
+};
+
+// deck 有 metric 则全局用它(如人均 GDP);否则按 item 类别推断。
+export function metricLabel(deck: DeckDef, item: DeckItem): string {
+  return deck.metric || CATEGORY_METRIC[item.category];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -264,7 +280,7 @@ export const DECKS: DeckDef[] = [
       "Guess right to keep your streak going; one wrong guess ends the run.",
     ],
     body: "WorthMore is a Higher or Lower game played with real money values. Every card is something with a dollar figure attached: a country's annual GDP, a big company's market capitalization, a US state or Chinese province's economic output, or a famous sports team's valuation. Because everything is measured in the same unit — US dollars — you can compare wildly different things, like whether Real Madrid is worth more than the country of Iceland, or whether Nvidia is worth more than the GDP of Canada. Values are approximate snapshots from public sources (World Bank, IMF, company market caps, Forbes team valuations) and are labeled with the year they are from. The goal is simple: build the longest streak you can, then share it and challenge a friend to beat it.",
-    valueLabel: "total value (USD)",
+    valueLabel: "value in US dollars",
     faq: [
       {
         q: "Where do the numbers come from?",
@@ -309,6 +325,7 @@ export const DECKS: DeckDef[] = [
     ],
     body: "This is the per-person version of the money game. Instead of total GDP — where big countries always win — GDP per capita divides a country's output by its population, so small, wealthy nations like Luxembourg, Ireland and Switzerland rise to the top while large economies can sit surprisingly low. It is a great way to build intuition about which countries are 'rich' on a per-person basis versus simply large. Figures are approximate nominal GDP per capita for 2024 from public sources, rounded for a clean, fast game.",
     valueLabel: "GDP per capita (USD)",
+    metric: "GDP per capita",
     faq: [
       {
         q: "What is GDP per capita?",
