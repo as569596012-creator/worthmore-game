@@ -1,8 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getDeck, formatMoney, itemIcon, metricLabel, type DeckDef, type DeckItem } from "@/lib/decks";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import {
+  getDeck,
+  formatMoney,
+  flagUrl,
+  logoUrl,
+  monogram,
+  monogramColor,
+  metricLabel,
+  type DeckDef,
+  type DeckItem,
+} from "@/lib/decks";
+import { SITE_NAME, SITE_URL, LOGODEV_TOKEN } from "@/lib/site";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -159,7 +169,7 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
 
           {/* 右卡:待猜 / 揭示中 */}
           <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 bg-gradient-to-b from-gray-50 to-white p-5 text-center">
-            <div className="text-4xl">{itemIcon(right)}</div>
+            <ItemVisual key={right.name} item={right} />
             <div className="text-lg font-bold text-gray-900">{right.name}</div>
             <div className="text-xs uppercase tracking-wide text-gray-400">
               {right.category} · {metricLabel(deck, right)} · {right.asOf}
@@ -206,6 +216,41 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
   );
 }
 
+// 卡片视觉:优先真实旗帜(flagcdn)→ 真实 logo(logo.dev,需 token)→ 字母牌兜底。
+// 用 key={item.name} 渲染,确保切换标的时 errored 状态重置。
+function ItemVisual({ item }: { item: DeckItem }) {
+  const [errored, setErrored] = useState(false);
+  const flag = flagUrl(item);
+  const logo = logoUrl(item, LOGODEV_TOKEN);
+  const src = flag ?? logo;
+
+  if (src && !errored) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={item.name}
+        loading="lazy"
+        onError={() => setErrored(true)}
+        className={
+          flag
+            ? "h-12 w-auto rounded shadow-sm ring-1 ring-black/10"
+            : "h-16 w-16 rounded-xl bg-white object-contain p-1 ring-1 ring-black/5"
+        }
+      />
+    );
+  }
+
+  return (
+    <div
+      className="flex h-16 w-16 items-center justify-center rounded-xl text-xl font-extrabold text-white shadow-sm"
+      style={{ backgroundColor: monogramColor(item.name) }}
+    >
+      {monogram(item.name)}
+    </div>
+  );
+}
+
 function Card({
   item,
   deck,
@@ -221,7 +266,7 @@ function Card({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white p-5 text-center">
-      <div className="text-4xl">{itemIcon(item)}</div>
+      <ItemVisual key={item.name} item={item} />
       <div className="text-lg font-bold text-gray-900">{item.name}</div>
       <div className="text-xs uppercase tracking-wide text-gray-400">
         {item.category} · {metricLabel(deck, item)} · {item.asOf}

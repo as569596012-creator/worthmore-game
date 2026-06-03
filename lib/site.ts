@@ -32,6 +32,9 @@ export const ADSENSE_PUBLISHER_ID = env("NEXT_PUBLIC_ADSENSE_PUBLISHER_ID", "");
 export const GA4_ID = env("NEXT_PUBLIC_GA4_ID", ""); // G-XXXXXXX
 export const PLAUSIBLE_DOMAIN = env("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "");
 
+// logo.dev publishable token(pk_...)。留空则公司/球队显示字母牌,不请求外部 logo。
+export const LOGODEV_TOKEN = env("NEXT_PUBLIC_LOGODEV_TOKEN", "");
+
 export function absoluteUrl(path = "/"): string {
   const clean = path.startsWith("/") ? path : `/${path}`;
   return `${SITE_URL}${clean}`;

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE_NAME, AUTHOR_NAME } from "@/lib/site";
+import { SITE_NAME, AUTHOR_NAME, LOGODEV_TOKEN } from "@/lib/site";
 import { DECKS } from "@/lib/decks";
 
 export default function Footer() {
@@ -59,6 +59,20 @@ export default function Footer() {
       <div className="border-t border-gray-200 py-4 text-center text-xs text-gray-500">
         © {year} {SITE_NAME}. Built and maintained by {AUTHOR_NAME}. Values are approximate
         snapshots for entertainment only.
+        {LOGODEV_TOKEN ? (
+          <>
+            {" "}
+            Logos provided by{" "}
+            <a
+              href="https://logo.dev"
+              rel="noopener noreferrer"
+              className="underline hover:text-brand-700"
+            >
+              Logo.dev
+            </a>
+            .
+          </>
+        ) : null}
       </div>
     </footer>
   );
