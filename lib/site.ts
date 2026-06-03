@@ -7,7 +7,7 @@ function env(key: string, fallback: string): string {
 }
 
 // 站点正式域名(上线前在 .env / Cloudflare 环境变量里设成真实域名,例如 https://worthmore.app)
-export const SITE_URL = env("NEXT_PUBLIC_SITE_URL", "https://worthmore.app").replace(/\/$/, "");
+export const SITE_URL = env("NEXT_PUBLIC_SITE_URL", "https://worthmore-game.pages.dev").replace(/\/$/, "");
 
 export const SITE_NAME = env("NEXT_PUBLIC_SITE_NAME", "WorthMore");
 
