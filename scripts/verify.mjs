@@ -120,21 +120,51 @@ async function main() {
   const leftVal = (await page.getByTestId("left-value").first().textContent())?.trim() || "";
   check("左卡显示美元数值", /\$/.test(leftVal), `"${leftVal}"`);
 
-  const higher = page.getByTestId("btn-higher");
-  const lower = page.getByTestId("btn-lower");
-  check("Higher / Lower 按钮存在", (await higher.count()) > 0 && (await lower.count()) > 0);
+  const cardLeft = page.getByTestId("card-left");
+  const cardRight = page.getByTestId("card-right");
+  check("左右卡片可点击", (await cardLeft.count()) > 0 && (await cardRight.count()) > 0);
 
-  // 点击 Higher,在揭示窗口内确认右卡数值被揭示
-  await higher.click();
+  // 点击右卡,在揭示窗口内确认右卡数值被揭示
+  await cardRight.click();
   await page.waitForTimeout(300);
   const rightVal = (await page.getByTestId("right-value").first().textContent())?.trim() || "";
-  check("点击后揭示右卡数值", /\$/.test(rightVal), `"${rightVal}"`);
+  check("点击卡片后揭示右卡数值", /\$/.test(rightVal), `"${rightVal}"`);
 
   // 等待结算:要么连胜推进(streak 仍在),要么游戏结束面板出现
   await page.waitForTimeout(1300);
   const hasStreak = (await page.getByTestId("streak").count()) > 0;
   const hasOver = (await page.getByTestId("game-over").count()) > 0;
   check("结算后状态有效(继续或结束)", hasStreak || hasOver, `streak=${hasStreak} over=${hasOver}`);
+
+  console.log("\n4) 退出确认拦截:");
+  // 重新加载,反复点右卡直到答对一题(streak>0),再点 Header 主页链接应被拦截
+  await page.goto(BASE + "/which-is-worth-more/", { waitUntil: "networkidle" });
+  let streakNow = 0;
+  for (let i = 0; i < 8 && streakNow === 0; i++) {
+    await page.getByTestId("card-right").click();
+    await page.waitForTimeout(1100);
+    if ((await page.getByTestId("game-over").count()) > 0) {
+      await page.getByTestId("play-again").click();
+      await page.waitForTimeout(200);
+      continue;
+    }
+    streakNow = Number((await page.getByTestId("streak").first().textContent()) || "0");
+  }
+  check("成功取得连胜(streak>0)用于触发拦截", streakNow > 0, `streak=${streakNow}`);
+
+  // 点 Header 里的首页 logo 链接
+  await page.locator('header a[href="/"]').first().click();
+  await page.waitForTimeout(300);
+  const modalShown = (await page.getByTestId("exit-modal").count()) > 0;
+  const stillOnGame = page.url().includes("/which-is-worth-more");
+  check("点击导航弹出退出确认且未跳转", modalShown && stillOnGame, `modal=${modalShown} url="${page.url().replace(BASE, "")}"`);
+
+  // 点 "Leave anyway" 应放行跳转回首页
+  if (modalShown) {
+    await page.getByTestId("exit-leave").click();
+    await page.waitForTimeout(500);
+    check("Leave anyway 后跳转生效", !page.url().includes("/which-is-worth-more"), `url="${page.url().replace(BASE, "")}"`);
+  }
 
   await browser.close();
   server.close();

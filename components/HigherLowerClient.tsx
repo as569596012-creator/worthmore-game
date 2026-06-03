@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   getDeck,
   formatMoney,
@@ -36,10 +37,12 @@ function fmtTimerDisplay(sec: number): string {
 }
 
 type Phase = "playing" | "revealed" | "over";
+type Side = "left" | "right";
 
 export default function HigherLowerClient({ slug }: { slug: string }) {
   const deck = getDeck(slug);
   const storageKey = `wm_best_${slug}`;
+  const router = useRouter();
 
   const [queue, setQueue] = useState<DeckItem[]>([]);
   const [step, setStep] = useState(0);
@@ -47,6 +50,7 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
   const [best, setBest] = useState(0);
   const [phase, setPhase] = useState<Phase>("playing");
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
+  const [pickedSide, setPickedSide] = useState<Side | null>(null);
   const [copied, setCopied] = useState(false);
 
   // 计时器
@@ -59,7 +63,6 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
   const [exitPending, setExitPending] = useState<(() => void) | null>(null);
   const streakRef = useRef(0);
   const phaseRef = useRef<Phase>("playing");
-  const origPushState = useRef<typeof window.history.pushState | null>(null);
 
   // 同步 ref，供事件回调读取最新值（避免闭包捕获旧值）
   useEffect(() => {
@@ -92,6 +95,7 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
     setStreak(0);
     setPhase("playing");
     setLastCorrect(null);
+    setPickedSide(null);
     setCopied(false);
     setFinalElapsed(0);
     startTimer();
@@ -114,7 +118,7 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
     }
   }, [storageKey]);
 
-  // 退出保护：beforeunload + pushState monkey-patch + popstate
+  // 退出保护：文档级 click 捕获（兼容 Next App Router 的 Link 导航）+ beforeunload + popstate
   useEffect(() => {
     const shouldGuard = () =>
       phaseRef.current !== "over" && streakRef.current > 0;
@@ -127,18 +131,24 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // monkey-patch history.pushState 捕获 SPA 内路由跳转
-    const orig = window.history.pushState.bind(window.history);
-    origPushState.current = orig;
-    window.history.pushState = (
-      ...args: Parameters<typeof window.history.pushState>
-    ) => {
-      if (shouldGuard()) {
-        setExitPending(() => () => orig(...args));
-      } else {
-        orig(...args);
-      }
+    // 捕获阶段拦截站内 <a> 跳转：Next 15 的 Link 用 React 合成事件 + 缓存的 pushState，
+    // 在文档捕获阶段 preventDefault + stopPropagation 才能可靠拦下。
+    const onDocClick = (e: MouseEvent) => {
+      if (!shouldGuard()) return;
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
+        return;
+      const target = e.target as HTMLElement | null;
+      const a = target?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || a.target === "_blank") return;
+      const url = new URL(a.href, window.location.href);
+      if (url.origin !== window.location.origin) return; // 外链放行
+      if (url.pathname === window.location.pathname) return; // 同页锚点放行
+      e.preventDefault();
+      e.stopPropagation();
+      const dest = url.pathname + url.search;
+      setExitPending(() => () => router.push(dest));
     };
+    document.addEventListener("click", onDocClick, true);
 
     const handlePopState = () => {
       if (shouldGuard()) {
@@ -151,12 +161,10 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("click", onDocClick, true);
       window.removeEventListener("popstate", handlePopState);
-      if (origPushState.current) {
-        window.history.pushState = origPushState.current;
-      }
     };
-  }, []); // 只挂一次；streakRef/phaseRef 始终持有最新值
+  }, [router]); // streakRef/phaseRef 始终持有最新值
 
   if (!deck) return null;
 
@@ -170,10 +178,12 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
     );
   }
 
-  const guess = (dir: "higher" | "lower") => {
+  // 点击卡片即猜测：点右卡=赌右边更大(higher)，点左卡=赌左边更大(lower)
+  const pick = (side: Side) => {
     if (phase !== "playing") return;
+    setPickedSide(side);
     const correct =
-      dir === "higher" ? right.value >= left.value : right.value < left.value;
+      side === "right" ? right.value >= left.value : left.value > right.value;
     setLastCorrect(correct);
     setPhase("revealed");
 
@@ -193,6 +203,7 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
           setStep(nextStep);
           setPhase("playing");
           setLastCorrect(null);
+          setPickedSide(null);
         } else {
           const elapsed = elapsedSec;
           stopTimer(elapsed);
@@ -237,6 +248,8 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const pickPrompt = deck.pickPrompt ?? "Tap the card you think is worth more";
+
   return (
     <>
       {exitPending && (
@@ -244,8 +257,9 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
           streak={streak}
           onStay={() => setExitPending(null)}
           onLeave={() => {
+            const go = exitPending;
             setExitPending(null);
-            exitPending();
+            go();
           }}
         />
       )}
@@ -279,62 +293,51 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
             copied={copied}
           />
         ) : (
-          <div className="grid gap-3 md:grid-cols-2">
-            {/* 左卡：已揭示 */}
-            <Card
-              item={left}
-              deck={deck}
-              valueLabel={deck.valueLabel}
-              revealed
-              value={formatMoney(left.value)}
-            />
-
-            {/* 右卡：待猜 / 揭示中 */}
-            <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 bg-gradient-to-b from-gray-50 to-white p-5 text-center">
-              <ItemVisual key={right.name} item={right} />
-              <div className="text-lg font-bold text-gray-900">{right.name}</div>
-              <div className="text-xs uppercase tracking-wide text-gray-400">
-                {right.category} · {metricLabel(deck, right)} · {right.asOf}
-              </div>
-
-              {phase === "revealed" ? (
-                <div className="mt-1">
-                  <div
-                    data-testid="right-value"
-                    className={`text-2xl font-extrabold ${lastCorrect ? "text-brand-600" : "text-red-600"}`}
-                  >
-                    {formatMoney(right.value)}
-                  </div>
-                  <div className="mt-1 text-sm font-semibold">
-                    {lastCorrect ? "✅ Correct!" : "❌ Wrong!"}
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-1 flex flex-col gap-2">
-                  <div className="text-2xl font-extrabold text-gray-300">
-                    $ ? ? ?
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      data-testid="btn-higher"
-                      onClick={() => guess("higher")}
-                      className="rounded-full bg-brand-600 px-5 py-2 text-sm font-bold text-white transition hover:bg-brand-700"
-                    >
-                      ▲ Higher
-                    </button>
-                    <button
-                      data-testid="btn-lower"
-                      onClick={() => guess("lower")}
-                      className="rounded-full bg-gray-800 px-5 py-2 text-sm font-bold text-white transition hover:bg-gray-900"
-                    >
-                      ▼ Lower
-                    </button>
-                  </div>
-                  <div className="text-xs text-gray-400">than {left.name}</div>
-                </div>
-              )}
+          <>
+            {/* 引导语 */}
+            <div className="mb-3 text-center">
+              <p className="text-base font-bold text-gray-900 sm:text-lg">
+                👆 {pickPrompt}
+              </p>
+              <p className="mt-0.5 text-xs text-gray-400">
+                Tap a card to lock in your guess
+              </p>
             </div>
-          </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              {/* 左卡：已揭示数值，点击=赌左边更大 */}
+              <Card
+                side="left"
+                item={left}
+                deck={deck}
+                valueLabel={deck.valueLabel}
+                value={formatMoney(left.value)}
+                revealedValue
+                phase={phase}
+                picked={pickedSide === "left"}
+                correct={lastCorrect}
+                onPick={() => pick("left")}
+              />
+
+              {/* 右卡：未揭示，点击=赌右边更大 */}
+              <Card
+                side="right"
+                item={right}
+                deck={deck}
+                valueLabel={deck.valueLabel}
+                value={formatMoney(right.value)}
+                revealedValue={phase === "revealed"}
+                phase={phase}
+                picked={pickedSide === "right"}
+                correct={lastCorrect}
+                onPick={() => pick("right")}
+              />
+            </div>
+
+            <p className="mt-3 text-center text-xs text-gray-400">
+              Comparing against <span className="font-medium">{left.name}</span>
+            </p>
+          </>
         )}
       </div>
     </>
@@ -354,7 +357,10 @@ function ExitConfirmModal({
   onLeave: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+    <div
+      data-testid="exit-modal"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+    >
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl">
         <div className="mb-3 text-3xl">🚪</div>
         <h2 className="text-xl font-extrabold text-gray-900">Leave game?</h2>
@@ -365,12 +371,14 @@ function ExitConfirmModal({
         </p>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <button
+            data-testid="exit-stay"
             onClick={onStay}
             className="rounded-full bg-brand-600 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
           >
             Stay &amp; keep playing
           </button>
           <button
+            data-testid="exit-leave"
             onClick={onLeave}
             className="rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-red-300 hover:text-red-600"
           >
@@ -419,40 +427,91 @@ function ItemVisual({ item }: { item: DeckItem }) {
 }
 
 // ──────────────────────────────────────────────────────────────
-// 已揭示卡片
+// 可点击卡片（左右通用）
 // ──────────────────────────────────────────────────────────────
 function Card({
+  side,
   item,
   deck,
   valueLabel,
-  revealed,
   value,
+  revealedValue,
+  phase,
+  picked,
+  correct,
+  onPick,
 }: {
+  side: Side;
   item: DeckItem;
   deck: DeckDef;
   valueLabel: string;
-  revealed: boolean;
   value: string;
+  revealedValue: boolean;
+  phase: Phase;
+  picked: boolean;
+  correct: boolean | null;
+  onPick: () => void;
 }) {
+  const clickable = phase === "playing";
+
+  // 选中后的环框颜色：对=绿，错=红
+  let ring = "ring-1 ring-gray-200";
+  if (picked && phase !== "playing" && correct !== null) {
+    ring = correct ? "ring-2 ring-brand-500" : "ring-2 ring-red-500";
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white p-5 text-center">
+    <button
+      type="button"
+      data-testid={`card-${side}`}
+      onClick={onPick}
+      disabled={!clickable}
+      aria-label={`Pick ${item.name}`}
+      className={`flex flex-col items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white p-5 text-center transition ${ring} ${
+        clickable
+          ? "cursor-pointer hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md active:translate-y-0"
+          : "cursor-default"
+      }`}
+    >
       <ItemVisual key={item.name} item={item} />
       <div className="text-lg font-bold text-gray-900">{item.name}</div>
       <div className="text-xs uppercase tracking-wide text-gray-400">
         {item.category} · {metricLabel(deck, item)} · {item.asOf}
       </div>
-      {revealed && (
+
+      {revealedValue ? (
         <div>
           <div
-            data-testid="left-value"
-            className="text-2xl font-extrabold text-gray-900"
+            data-testid={`${side}-value`}
+            className={`text-2xl font-extrabold ${
+              side === "right" && correct !== null
+                ? correct
+                  ? "text-brand-600"
+                  : "text-red-600"
+                : "text-gray-900"
+            }`}
           >
             {value}
           </div>
-          <div className="mt-1 text-xs text-gray-400">{valueLabel}</div>
+          {side === "left" ? (
+            <div className="mt-1 text-xs text-gray-400">{valueLabel}</div>
+          ) : (
+            correct !== null && (
+              <div className="mt-1 text-sm font-semibold">
+                {correct ? "✅ Correct!" : "❌ Wrong!"}
+              </div>
+            )
+          )}
+        </div>
+      ) : (
+        <div className="mt-1">
+          <div className="text-2xl font-extrabold text-gray-300">$ ? ? ?</div>
+          <div className="mt-1 text-xs font-medium text-brand-600">
+            Tap to pick
+          </div>
         </div>
       )}
-    </div>
+    </button>
   );
 }
 

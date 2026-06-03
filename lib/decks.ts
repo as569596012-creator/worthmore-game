@@ -38,6 +38,7 @@ export interface DeckDef {
   body: string;
   valueLabel: string; // 卡片上数值的说明,如 "value in US dollars"
   metric?: string; // deck 级指标覆盖(如人均 GDP);留空则按类别推断(见 metricLabel)
+  pickPrompt?: string; // 两卡上方的引导语;留空用默认 "Tap the card you think is worth more"
   faq: FaqItem[];
   items: DeckItem[];
 }
@@ -291,9 +292,10 @@ export const DECKS: DeckDef[] = [
     ],
     howTo: [
       "Look at the value shown on the left card.",
-      "Decide whether the right card is worth MORE (higher) or LESS (lower).",
+      "Tap whichever card you think is worth more.",
       "Guess right to keep your streak going; one wrong guess ends the run.",
     ],
+    pickPrompt: "Tap the card you think is worth more",
     body: "WorthMore is a Higher or Lower game played with real money values. Every card is something with a dollar figure attached: a country's annual GDP, a big company's market capitalization, a US state or Chinese province's economic output, or a famous sports team's valuation. Because everything is measured in the same unit — US dollars — you can compare wildly different things, like whether Real Madrid is worth more than the country of Iceland, or whether Nvidia is worth more than the GDP of Canada. Values are approximate snapshots from public sources (World Bank, IMF, company market caps, Forbes team valuations) and are labeled with the year they are from. The goal is simple: build the longest streak you can, then share it and challenge a friend to beat it.",
     valueLabel: "value in US dollars",
     faq: [
@@ -335,9 +337,10 @@ export const DECKS: DeckDef[] = [
     ],
     howTo: [
       "Look at the GDP per capita shown on the left card.",
-      "Decide whether the right country's GDP per capita is higher or lower.",
+      "Tap the country you think has the higher GDP per capita.",
       "Keep guessing right to grow your streak; one miss ends the run.",
     ],
+    pickPrompt: "Tap the country with the higher GDP per capita",
     body: "This is the per-person version of the money game. Instead of total GDP — where big countries always win — GDP per capita divides a country's output by its population, so small, wealthy nations like Luxembourg, Ireland and Switzerland rise to the top while large economies can sit surprisingly low. It is a great way to build intuition about which countries are 'rich' on a per-person basis versus simply large. Figures are approximate nominal GDP per capita for 2024 from public sources, rounded for a clean, fast game.",
     valueLabel: "GDP per capita (USD)",
     metric: "GDP per capita",
