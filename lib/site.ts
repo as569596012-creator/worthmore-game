@@ -32,8 +32,10 @@ export const ADSENSE_PUBLISHER_ID = env("NEXT_PUBLIC_ADSENSE_PUBLISHER_ID", "");
 export const GA4_ID = env("NEXT_PUBLIC_GA4_ID", ""); // G-XXXXXXX
 export const PLAUSIBLE_DOMAIN = env("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "");
 
-// logo.dev publishable token(pk_...)。留空则公司/球队显示字母牌,不请求外部 logo。
-export const LOGODEV_TOKEN = env("NEXT_PUBLIC_LOGODEV_TOKEN", "");
+// logo.dev publishable token(pk_...)。这是"可公开"密钥(本就会出现在客户端图片 URL 里),
+// 所以直接作为默认值内置,本地与 Cloudflare 都无需额外配置即可显示真实 logo。
+// 想换 key 时用环境变量 NEXT_PUBLIC_LOGODEV_TOKEN 覆盖即可。
+export const LOGODEV_TOKEN = env("NEXT_PUBLIC_LOGODEV_TOKEN", "pk_NPhlMYqSTviHgLeEnG3PGg");
 
 export function absoluteUrl(path = "/"): string {
   const clean = path.startsWith("/") ? path : `/${path}`;
