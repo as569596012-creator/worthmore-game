@@ -1,0 +1,10 @@
+# WorthMore
+
+> Free Higher or Lower money games. Guess which is worth more — countries by GDP, companies by market cap, US states, Chinese provinces and sports teams — and build the longest streak. No sign-up, plays instantly in the browser.
+
+## Games
+- Which Is Worth More?: /which-is-worth-more/ — mixed pool of countries, companies, states, provinces and teams, all valued in US dollars.
+- GDP Per Capita: Higher or Lower: /gdp-per-capita-higher-or-lower/ — guess which country has the higher income per person.
+
+## Notes
+- All money values are approximate public-source snapshots, labelled with the year they are from. For entertainment only, not a financial reference.

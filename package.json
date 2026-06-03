@@ -1,0 +1,33 @@
+{
+  "name": "worthmore",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WorthMore — Higher or Lower money guessing game. Guess which country, company or team is worth more. Static SEO + viral game site.",
+  "scripts": {
+    "dev": "next dev",
+    "gen:sitemap": "node scripts/gen-sitemap.mjs",
+    "prebuild": "node scripts/gen-sitemap.mjs",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "serve:out": "npx serve out -l 4321",
+    "verify": "node scripts/verify.mjs"
+  },
+  "dependencies": {
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.18.0",
+    "eslint-config-next": "^15.1.6",
+    "playwright": "^1.49.1",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3"
+  }
+}
