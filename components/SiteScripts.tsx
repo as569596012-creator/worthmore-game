@@ -1,5 +1,5 @@
 import Script from "next/script";
-import { ADSENSE_PUBLISHER_ID, GA4_ID, PLAUSIBLE_DOMAIN } from "@/lib/site";
+import { ADSENSE_PUBLISHER_ID, CF_ANALYTICS_TOKEN, GA4_ID, PLAUSIBLE_DOMAIN } from "@/lib/site";
 
 // 根据 .env 是否配置,按需注入第三方脚本。全部留空时不加载任何外部脚本(本地开发干净、首屏更快)。
 export default function SiteScripts() {
@@ -40,6 +40,16 @@ gtag('js', new Date());
 gtag('config', '${GA4_ID}');`}
           </Script>
         </>
+      )}
+
+      {CF_ANALYTICS_TOKEN && (
+        <Script
+          id="cf-analytics"
+          defer
+          strategy="afterInteractive"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={`{"token": "${CF_ANALYTICS_TOKEN}"}`}
+        />
       )}
     </>
   );

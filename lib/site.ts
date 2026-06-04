@@ -31,6 +31,7 @@ export const CONTACT_EMAIL = env("NEXT_PUBLIC_CONTACT_EMAIL", "hello@example.com
 export const ADSENSE_PUBLISHER_ID = env("NEXT_PUBLIC_ADSENSE_PUBLISHER_ID", ""); // ca-pub-xxxxxxxx
 export const GA4_ID = env("NEXT_PUBLIC_GA4_ID", ""); // G-XXXXXXX
 export const PLAUSIBLE_DOMAIN = env("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "");
+export const CF_ANALYTICS_TOKEN = env("NEXT_PUBLIC_CF_ANALYTICS_TOKEN", ""); // Cloudflare Web Analytics Beacon Token
 
 // logo.dev publishable token(pk_...)。这是"可公开"密钥(本就会出现在客户端图片 URL 里),
 // 所以直接作为默认值内置,本地与 Cloudflare 都无需额外配置即可显示真实 logo。
