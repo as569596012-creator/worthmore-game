@@ -118,6 +118,28 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
     }
   }, [storageKey]);
 
+  // 预加载下一对卡片的图片(国旗/队徽),消除翻页时的弹入/卡顿
+  useEffect(() => {
+    if (typeof window === "undefined" || queue.length === 0) return;
+    const urls: string[] = [];
+    for (const idx of [step + 2, step + 3]) {
+      const it = queue[idx];
+      if (!it) continue;
+      if (it.flagCode && it.domain) {
+        const crest = logoUrl(it, LOGODEV_TOKEN);
+        if (crest) urls.push(crest);
+        urls.push(`https://flagcdn.com/w80/${it.flagCode}.png`);
+      } else {
+        const u = flagUrl(it) ?? logoUrl(it, LOGODEV_TOKEN);
+        if (u) urls.push(u);
+      }
+    }
+    urls.forEach((u) => {
+      const img = new Image();
+      img.src = u;
+    });
+  }, [step, queue]);
+
   // 退出保护：文档级 click 捕获（兼容 Next App Router 的 Link 导航）+ beforeunload + popstate
   useEffect(() => {
     const shouldGuard = () =>
@@ -182,8 +204,13 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
   const pick = (side: Side) => {
     if (phase !== "playing") return;
     setPickedSide(side);
+    // 等值时两边都算对(数据里有大量并列身价,避免"没猜错却输"的挫败感)
     const correct =
-      side === "right" ? right.value >= left.value : left.value > right.value;
+      left.value === right.value
+        ? true
+        : side === "right"
+          ? right.value > left.value
+          : left.value > right.value;
     setLastCorrect(correct);
     setPhase("revealed");
 
@@ -219,7 +246,7 @@ export default function HigherLowerClient({ slug }: { slug: string }) {
           setPhase("over");
         }
       },
-      correct ? 850 : 1050,
+      correct ? 550 : 850,
     );
   };
 
@@ -444,7 +471,7 @@ function ItemVisual({ item }: { item: DeckItem }) {
         onError={() => setErrored(true)}
         className={
           flag
-            ? "h-12 w-auto rounded shadow-sm ring-1 ring-black/10"
+            ? "h-12 w-16 rounded object-contain shadow-sm ring-1 ring-black/10"
             : "h-16 w-16 rounded-xl bg-white object-contain p-1 ring-1 ring-black/5"
         }
       />
