@@ -3,8 +3,15 @@
 > Free Higher or Lower money games. Guess which is worth more — countries by GDP, companies by market cap, US states, Chinese provinces and sports teams — and build the longest streak. No sign-up, plays instantly in the browser.
 
 ## Games
+- World Cup Player Value: Higher or Lower: /world-cup-player-value-higher-or-lower/ — guess which footballer has the higher transfer market value, across 150+ stars of the 2026 World Cup.
+- National Team Value: Higher or Lower: /world-cup-team-value-higher-or-lower/ — guess which national team has the higher total squad market value.
 - Which Is Worth More?: /which-is-worth-more/ — mixed pool of countries, companies, states, provinces and teams, all valued in US dollars.
 - GDP Per Capita: Higher or Lower: /gdp-per-capita-higher-or-lower/ — guess which country has the higher income per person.
 
+## Guides
+- Most Valuable Players at the 2026 World Cup: /guides/most-valuable-world-cup-2026-players/
+- Most Valuable National Teams at the 2026 World Cup: /guides/most-valuable-national-teams-2026/
+
 ## Notes
-- All money values are approximate public-source snapshots, labelled with the year they are from. For entertainment only, not a financial reference.
+- All money values are approximate public-source snapshots, labelled with the year/month they are from. For entertainment only, not a financial reference.
+- Football player and national team values are Transfermarkt-style estimates converted to USD. WorthMore is independent and not affiliated with FIFA, the World Cup or Transfermarkt.

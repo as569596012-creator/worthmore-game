@@ -16,7 +16,30 @@ export default function HomePage() {
         <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">{SITE_TAGLINE}</p>
       </section>
 
-      <section className="mt-12 grid gap-5 sm:grid-cols-2">
+      <Link
+        href="/world-cup-player-value-higher-or-lower/"
+        className="mt-10 block rounded-2xl border border-brand-300 bg-gradient-to-r from-brand-50 to-emerald-50 p-5 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6"
+      >
+        <div className="flex items-center gap-4">
+          <div className="text-4xl">⚽</div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-brand-700">
+              New · World Cup 2026 special
+            </p>
+            <h2 className="mt-1 text-xl font-extrabold text-gray-900 sm:text-2xl">
+              Guess the football market values — kicks off June 11
+            </h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Higher or Lower, World Cup edition: which player (or national team) is worth more?
+            </p>
+          </div>
+          <span className="ml-auto hidden whitespace-nowrap text-sm font-semibold text-brand-600 sm:inline">
+            Play now →
+          </span>
+        </div>
+      </Link>
+
+      <section className="mt-8 grid gap-5 sm:grid-cols-2">
         {DECKS.map((deck) => (
           <Link
             key={deck.slug}

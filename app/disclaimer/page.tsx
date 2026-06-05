@@ -29,11 +29,21 @@ export default function DisclaimerPage() {
         We are not liable for any loss, cost, or damage arising from reliance on the figures or
         results shown in these games.
       </p>
+      <h2 className="mt-8 text-xl font-bold text-gray-900">Football &amp; World Cup content</h2>
+      <p className="mt-3">
+        Our football games use approximate player and national-team market values
+        (Transfermarkt-style estimates) converted to US dollars and rounded for entertainment.
+        {" "}
+        {SITE_NAME} is an independent project and is <strong>not affiliated with, endorsed by, or
+        associated with FIFA, the FIFA World Cup, Transfermarkt, or any club, league or national
+        association</strong>. &quot;World Cup&quot; and related names are referenced descriptively
+        only.
+      </p>
       <h2 className="mt-8 text-xl font-bold text-gray-900">Trademarks &amp; external links</h2>
       <p className="mt-3">
-        Country, company and team names are the property of their respective owners and are used
-        here for identification only. Some pages may contain ads or links to third-party sites; we
-        are not responsible for their content or practices.
+        Country, company, club, team and player names are the property of their respective owners
+        and are used here for identification only. Some pages may contain ads or links to
+        third-party sites; we are not responsible for their content or practices.
       </p>
     </article>
   );

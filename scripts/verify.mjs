@@ -68,8 +68,12 @@ function startServer() {
 
 const ROUTES = [
   { path: "/", h1Includes: "Higher or Lower" },
+  { path: "/world-cup-player-value-higher-or-lower/", h1Includes: "Player Value" },
+  { path: "/world-cup-team-value-higher-or-lower/", h1Includes: "National Team Value" },
   { path: "/which-is-worth-more/", h1Includes: "Worth More" },
   { path: "/gdp-per-capita-higher-or-lower/", h1Includes: "Per Capita" },
+  { path: "/guides/most-valuable-world-cup-2026-players/", h1Includes: "Most Valuable Players" },
+  { path: "/guides/most-valuable-national-teams-2026/", h1Includes: "Most Valuable National Teams" },
   { path: "/about/", h1Includes: "About" },
   { path: "/contact/", h1Includes: "Contact" },
   { path: "/privacy/", h1Includes: "Privacy" },

@@ -397,6 +397,41 @@ function ItemVisual({ item }: { item: DeckItem }) {
   const [errored, setErrored] = useState(false);
   const flag = flagUrl(item);
   const logo = logoUrl(item, LOGODEV_TOKEN);
+
+  // 球员卡:俱乐部队徽为主图 + 右下角国籍国旗角标
+  if (item.flagCode && item.domain) {
+    const crest = logoUrl(item, LOGODEV_TOKEN);
+    const natFlag = `https://flagcdn.com/w80/${item.flagCode}.png`;
+    return (
+      <div className="relative h-16 w-16">
+        {crest && !errored ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={crest}
+            alt={item.name}
+            loading="lazy"
+            onError={() => setErrored(true)}
+            className="h-16 w-16 rounded-xl bg-white object-contain p-1 ring-1 ring-black/5"
+          />
+        ) : (
+          <div
+            className="flex h-16 w-16 items-center justify-center rounded-xl text-xl font-extrabold text-white shadow-sm"
+            style={{ backgroundColor: monogramColor(item.name) }}
+          >
+            {monogram(item.name)}
+          </div>
+        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={natFlag}
+          alt=""
+          loading="lazy"
+          className="absolute -bottom-1 -right-1 h-5 w-auto rounded-sm bg-white shadow ring-1 ring-black/10"
+        />
+      </div>
+    );
+  }
+
   const src = flag ?? logo;
 
   if (src && !errored) {
@@ -476,7 +511,9 @@ function Card({
       <ItemVisual key={item.name} item={item} />
       <div className="text-lg font-bold text-gray-900">{item.name}</div>
       <div className="text-xs uppercase tracking-wide text-gray-400">
-        {item.category} · {metricLabel(deck, item)} · {item.asOf}
+        {item.subtitle
+          ? `${item.subtitle} · ${metricLabel(deck, item)}`
+          : `${item.category} · ${metricLabel(deck, item)} · ${item.asOf}`}
       </div>
 
       {revealedValue ? (
