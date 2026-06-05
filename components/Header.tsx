@@ -18,6 +18,9 @@ export default function Header() {
               {d.name.replace(": Higher or Lower", "").replace("?", "")}
             </Link>
           ))}
+          <Link href="/guides/" className="hover:text-brand-700">
+            Guides
+          </Link>
         </nav>
       </div>
     </header>

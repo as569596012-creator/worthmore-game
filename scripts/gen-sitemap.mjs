@@ -18,8 +18,18 @@ if (slugs.length === 0) {
   throw new Error("gen-sitemap: no deck slugs found in lib/decks.ts");
 }
 
+// 从 guides.ts 提取内容文章 slug(可能没有文章,允许为空)
+let guideSlugs = [];
+try {
+  const guideSrc = readFileSync(join(root, "lib/guides.ts"), "utf8");
+  guideSlugs = [...guideSrc.matchAll(/\n\s{4}slug:\s*"([^"]+)"/g)].map((m) => m[1]);
+} catch {
+  guideSlugs = [];
+}
+
 const staticPages = [
   { path: "/", changefreq: "weekly", priority: "1" },
+  { path: "/guides/", changefreq: "monthly", priority: "0.6" },
   { path: "/about/", changefreq: "monthly", priority: "0.5" },
   { path: "/contact/", changefreq: "monthly", priority: "0.5" },
   { path: "/privacy/", changefreq: "monthly", priority: "0.5" },
@@ -32,7 +42,13 @@ const gamePages = slugs.map((slug) => ({
   priority: "0.9",
 }));
 
-const all = [...staticPages, ...gamePages];
+const guidePages = guideSlugs.map((slug) => ({
+  path: `/guides/${slug}/`,
+  changefreq: "monthly",
+  priority: "0.7",
+}));
+
+const all = [...staticPages, ...gamePages, ...guidePages];
 
 const urlsXml = all
   .map(
@@ -56,4 +72,6 @@ Sitemap: ${SITE_URL}/sitemap.xml
 `;
 writeFileSync(join(root, "public/robots.txt"), robots, "utf8");
 
-console.log(`gen-sitemap: wrote ${all.length} URLs (${slugs.length} games) to public/sitemap.xml`);
+console.log(
+  `gen-sitemap: wrote ${all.length} URLs (${slugs.length} games, ${guideSlugs.length} guides) to public/sitemap.xml`,
+);

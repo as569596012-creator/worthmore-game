@@ -93,3 +93,25 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
     })),
   };
 }
+
+// 内容文章页:Article(让搜索引擎/AI 识别为一篇文章,利于富结果与 E-E-A-T)
+export function articleJsonLd(guide: {
+  title: string;
+  metaDescription: string;
+  slug: string;
+  date: string;
+}) {
+  const url = absoluteUrl(`/guides/${guide.slug}/`);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: guide.title,
+    description: guide.metaDescription,
+    url,
+    mainEntityOfPage: url,
+    datePublished: guide.date,
+    dateModified: guide.date,
+    author: { "@type": "Organization", name: AUTHOR_NAME },
+    publisher: { "@type": "Organization", name: SITE_NAME },
+  };
+}
