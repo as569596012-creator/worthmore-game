@@ -2,6 +2,7 @@
   "name": "worthmore",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "WorthMore — Higher or Lower money guessing game. Guess which country, company or team is worth more. Static SEO + viral game site.",
   "scripts": {
     "dev": "next dev",
