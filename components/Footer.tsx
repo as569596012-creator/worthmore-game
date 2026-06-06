@@ -24,8 +24,8 @@ export default function Footer() {
               </li>
             ))}
             <li>
-              <Link href="/guess-the-footballer/" className="hover:text-brand-700">
-                Guess the Footballer
+              <Link href="/world-cup-bracket-predictor/" className="hover:text-brand-700">
+                World Cup Picker
               </Link>
             </li>
           </ul>

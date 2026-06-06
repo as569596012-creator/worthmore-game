@@ -3,7 +3,7 @@
 > Free Higher or Lower money games. Guess which is worth more — countries by GDP, companies by market cap, US states, Chinese provinces and sports teams — and build the longest streak. No sign-up, plays instantly in the browser.
 
 ## Games
-- Guess the Footballer: /guess-the-footballer/ — Who Are Ya-style guessing game; identify the mystery 2026 World Cup player from clues (nationality, club, league, position, age).
+- World Cup Picker: /world-cup-bracket-predictor/ — tap your winner of every knockout tie to predict the 2026 World Cup champion and share your bracket.
 - World Cup Player Value: Higher or Lower: /world-cup-player-value-higher-or-lower/ — guess which footballer has the higher transfer market value, across 150+ stars of the 2026 World Cup.
 - National Team Value: Higher or Lower: /world-cup-team-value-higher-or-lower/ — guess which national team has the higher total squad market value.
 - Which Is Worth More?: /which-is-worth-more/ — mixed pool of countries, companies, states, provinces and teams, all valued in US dollars.

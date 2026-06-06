@@ -68,7 +68,7 @@ function startServer() {
 
 const ROUTES = [
   { path: "/", h1Includes: "Higher or Lower" },
-  { path: "/guess-the-footballer/", h1Includes: "Guess the Footballer" },
+  { path: "/world-cup-bracket-predictor/", h1Includes: "World Cup Picker" },
   { path: "/world-cup-player-value-higher-or-lower/", h1Includes: "Player Value" },
   { path: "/world-cup-team-value-higher-or-lower/", h1Includes: "National Team Value" },
   { path: "/which-is-worth-more/", h1Includes: "Worth More" },
@@ -171,21 +171,22 @@ async function main() {
     check("Leave anyway 后跳转生效", !page.url().includes("/which-is-worth-more"), `url="${page.url().replace(BASE, "")}"`);
   }
 
-  console.log("\n5) 猜球员游戏(guess-the-footballer):");
-  await page.goto(BASE + "/guess-the-footballer/", { waitUntil: "networkidle" });
-  const gpInput = page.getByTestId("gp-input");
-  check("输入框存在", (await gpInput.count()) > 0);
-  // 输入触发自动补全,点第一个候选提交一次猜测,确认出现猜测行
-  await gpInput.fill("a");
-  await page.waitForTimeout(300);
-  const suggestCount = await page.getByTestId("gp-suggest").count();
-  check("自动补全有候选", suggestCount > 0, `suggestions=${suggestCount}`);
-  if (suggestCount > 0) {
-    await page.getByTestId("gp-suggest").first().click();
-    await page.waitForTimeout(300);
-    const rows = await page.getByTestId("gp-guess-row").count();
-    check("提交后出现猜测行(含线索)", rows > 0, `rows=${rows}`);
+  console.log("\n5) 世界杯预测(world-cup-bracket-predictor):");
+  await page.goto(BASE + "/world-cup-bracket-predictor/", { waitUntil: "networkidle" });
+  check("出现对阵选择按钮", (await page.getByTestId("wcp-pick").count()) > 0);
+  // 一路点第一个选项,直到出现冠军结算
+  let reachedResult = false;
+  for (let i = 0; i < 20; i++) {
+    if ((await page.getByTestId("wcp-result").count()) > 0) {
+      reachedResult = true;
+      break;
+    }
+    const pickBtn = page.getByTestId("wcp-pick").first();
+    if ((await pickBtn.count()) === 0) break;
+    await pickBtn.click();
+    await page.waitForTimeout(120);
   }
+  check("连点到出现冠军结算", reachedResult);
 
   await browser.close();
   server.close();

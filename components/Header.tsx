@@ -18,8 +18,8 @@ export default function Header() {
               {d.name.replace(": Higher or Lower", "").replace("?", "")}
             </Link>
           ))}
-          <Link href="/guess-the-footballer/" className="hover:text-brand-700">
-            Guess the Footballer
+          <Link href="/world-cup-bracket-predictor/" className="hover:text-brand-700">
+            World Cup Picker
           </Link>
           <Link href="/guides/" className="hover:text-brand-700">
             Guides

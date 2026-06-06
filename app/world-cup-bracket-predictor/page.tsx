@@ -1,62 +1,62 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import GuessPlayerClient from "@/components/GuessPlayerClient";
+import WorldCupPickerClient from "@/components/WorldCupPickerClient";
 import Faq from "@/components/Faq";
 import AdSlot from "@/components/AdSlot";
 import JsonLd from "@/components/JsonLd";
 import { buildMetadata, breadcrumbJsonLd } from "@/lib/seo";
 import { absoluteUrl, AUTHOR_NAME, SITE_NAME } from "@/lib/site";
 
-const SLUG = "guess-the-footballer";
+const SLUG = "world-cup-bracket-predictor";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Guess the Footballer — Daily Football Player Quiz (Free)",
+  title: "World Cup Picker — 2026 Bracket Predictor (Free, No Sign-up)",
   description:
-    "Free Who Are Ya-style football guessing game. Identify the mystery player from clues — nationality, club, league, position and age. No sign-up, share your result.",
+    "Predict the 2026 World Cup with one tap per tie. Pick your winner of every knockout match until you crown a champion, then share your bracket. Free, no sign-up.",
   path: `/${SLUG}/`,
   keywords: [
-    "guess the footballer",
-    "football player guessing game",
-    "who are ya football",
-    "soccer wordle",
-    "guess the player quiz",
-    "football quiz game",
+    "world cup 2026 predictor",
+    "world cup bracket predictor",
+    "world cup picker",
+    "predict the world cup",
+    "world cup 2026 bracket",
+    "who will win the world cup 2026",
   ],
 });
 
 const HOW_TO = [
-  "Type a footballer's name and pick from the list to lock in a guess.",
-  "Each guess reveals clues: nationality, club, league, position and age (green = match; the age arrow points toward the answer).",
-  "Use the clues to narrow it down and find the mystery player within 8 guesses.",
+  "You are shown two teams at a time, starting from the Round of 16.",
+  "Tap the flag of the team you think goes through.",
+  "Keep picking winners round by round until you crown your World Cup champion, then share your bracket.",
 ];
 
 const FAQ = [
   {
-    q: "How do I play Guess the Footballer?",
-    a: "You have 8 guesses to find the mystery footballer. After each guess, five clues light up green when they match the answer — nationality, club, league, position and age. The age clue shows an arrow pointing toward the correct age.",
+    q: "How does the World Cup Picker work?",
+    a: "It is a single-elimination knockout. You see two teams at a time and tap whichever you think advances. Winners move on round by round — Round of 16, quarter-finals, semi-finals and the final — until one team is left as your champion.",
   },
   {
-    q: "Which players can appear?",
-    a: "Around 150 of the most well-known players heading into the 2026 World Cup, across Europe's top five leagues plus the Saudi Pro League and MLS.",
+    q: "Is there a right or wrong answer?",
+    a: "No. It is your prediction, so there are no wrong picks — just tap the teams you believe in and share who you think wins it all.",
   },
   {
-    q: "Are the clues always accurate?",
-    a: "Club, league, position and age are approximate snapshots for 2026 and can change with transfers. The game is for entertainment only.",
+    q: "Is this the official 2026 World Cup bracket?",
+    a: "No. The matchups are a quick personal knockout among the leading contenders for fun, not the official fixtures. The real knockout bracket is set once the group stage is played.",
   },
   {
     q: "Is it free? Do I need an account?",
-    a: "Completely free, no sign-up. Your stats are saved locally in your browser, and you can share your result grid.",
+    a: "Completely free, no sign-up. Just tap through and share your result.",
   },
 ];
 
 const gameJson = {
   "@context": "https://schema.org",
   "@type": "Game",
-  name: "Guess the Footballer",
+  name: "World Cup Picker",
   url: absoluteUrl(`/${SLUG}/`),
   description:
-    "A free Who Are Ya-style football guessing game: identify the mystery player from clues like nationality, club, league, position and age.",
-  genre: "Trivia, Puzzle",
+    "A free World Cup 2026 bracket predictor: tap your winner of every knockout tie until you crown a champion, then share your bracket.",
+  genre: "Sports, Prediction",
   gamePlatform: "Web browser",
   applicationCategory: "GameApplication",
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -66,7 +66,7 @@ const gameJson = {
 const howToJson = {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  name: "How to play Guess the Footballer",
+  name: "How to play World Cup Picker",
   step: HOW_TO.map((s, i) => ({ "@type": "HowToStep", position: i + 1, text: s })),
 };
 
@@ -90,7 +90,7 @@ export default function Page() {
           faqJson,
           breadcrumbJsonLd([
             { name: "Home", path: "/" },
-            { name: "Guess the Footballer", path: `/${SLUG}/` },
+            { name: "World Cup Picker", path: `/${SLUG}/` },
           ]),
         ]}
       />
@@ -100,19 +100,20 @@ export default function Page() {
           Home
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-gray-700">Guess the Footballer</span>
+        <span className="text-gray-700">World Cup Picker</span>
       </nav>
 
       <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-        Guess the Footballer
+        World Cup Picker — 2026 Bracket Predictor
       </h1>
       <p className="mt-3 text-lg text-gray-600">
-        A daily-style football guessing game for the 2026 World Cup. Find the mystery player from
-        clues — nationality, club, league, position and age — in 8 guesses, then share your result.
+        Predict the 2026 World Cup one tap at a time. Pick your winner of every knockout tie until
+        you crown a champion — no football knowledge needed, just tap the flag you believe in and
+        share your bracket.
       </p>
 
       <div className="mt-6">
-        <GuessPlayerClient />
+        <WorldCupPickerClient />
       </div>
 
       <section className="mt-10">
@@ -131,11 +132,12 @@ export default function Page() {
       <section className="prose-tool mt-8">
         <h2 className="text-xl font-bold text-gray-900">About this game</h2>
         <p className="mt-3">
-          Guess the Footballer is a free Who Are Ya-style guessing game built around the stars of
-          the 2026 World Cup. Instead of a blurred photo, you get pure clues — nationality, club,
-          league, position and age — so it is fast, fair and works on any device. Player attributes
-          are approximate snapshots for 2026 and are for entertainment only. {SITE_NAME} is an
-          independent game and is not affiliated with FIFA, the World Cup or Transfermarkt.
+          World Cup Picker is a free, instant prediction game for the 2026 World Cup. There is
+          nothing to learn and no wrong answers — you are simply shown two teams and tap whichever
+          you think goes through, round by round, until one nation is left standing as your champion.
+          It is the fastest way to lock in your World Cup prediction and share it with friends before
+          kickoff. {SITE_NAME} is an independent game and is not affiliated with FIFA or the World
+          Cup; matchups are a personal knockout for entertainment, not the official fixtures.
         </p>
       </section>
 
