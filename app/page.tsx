@@ -40,6 +40,22 @@ export default function HomePage() {
       </Link>
 
       <section className="mt-8 grid gap-5 sm:grid-cols-2">
+        <Link
+          href="/guess-the-footballer/"
+          className="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
+        >
+          <div className="text-3xl">🕵️</div>
+          <h2 className="mt-3 text-xl font-bold text-gray-900 group-hover:text-brand-700">
+            Guess the Footballer
+          </h2>
+          <p className="mt-1 text-sm text-gray-600">
+            Who Are Ya-style daily quiz: find the mystery World Cup player from clues — nationality,
+            club, league, position and age.
+          </p>
+          <span className="mt-4 inline-block text-sm font-semibold text-brand-600">
+            Play now →
+          </span>
+        </Link>
         {DECKS.map((deck) => (
           <Link
             key={deck.slug}

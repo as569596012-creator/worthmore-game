@@ -29,6 +29,8 @@ try {
 
 const staticPages = [
   { path: "/", changefreq: "weekly", priority: "1" },
+  // 猜球员游戏是独立路由(不在 decks.ts),需手动登记
+  { path: "/guess-the-footballer/", changefreq: "weekly", priority: "0.9" },
   { path: "/guides/", changefreq: "monthly", priority: "0.6" },
   { path: "/about/", changefreq: "monthly", priority: "0.5" },
   { path: "/contact/", changefreq: "monthly", priority: "0.5" },

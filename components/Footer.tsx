@@ -23,6 +23,11 @@ export default function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href="/guess-the-footballer/" className="hover:text-brand-700">
+                Guess the Footballer
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
